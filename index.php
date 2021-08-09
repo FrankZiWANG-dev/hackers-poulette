@@ -39,11 +39,11 @@ if(filter_has_var(INPUT_GET, 'submit')){
     $message = $_GET["message"];
 
     $variables = array ($firstName, $lastName, $email, $country, $message);
-    $error= "Please fill this field in."
+    $error= "Please fill this field in.";
 
     //if all fields filled in but honeypot field empty
     if (!empty($firstName) AND !empty($lastName) AND !empty($email) AND !empty($country) AND !empty($message) AND empty($honey)){
-        //if doesn't display error message
+        //if doesn't currently display error message
         if ( ($firstName !== $error) AND ($lastName !== $error) AND ($email !== $error) AND ($country !== $error) AND ($message !== $error) ){
             //sanitize
             for ($x=0; $x<sizeof($variables); $x++){
@@ -59,7 +59,20 @@ if(filter_has_var(INPUT_GET, 'submit')){
             }
             //validate
         if (filter_var(trim($email), FILTER_VALIDATE_EMAIL) == true){
-            echo "valid e-mail";
+            $toEmail = "wang.frank.zi@gmail.com";
+            $subject = "Thanks for your message!";
+            $body = "<h2>Thank you for reaching out!</h2> <p> We'll get back to you ASAP! </p>";
+            $headers= "MIME-Version:1.0" ."\r\n";
+            $headers .= "Content-Type:text/html;charset=UTF-!"."\r\n";
+            $headers .= "From ".$firstName .$lastName ."<" .$email .">" ."\r\n";
+
+                if (mail($toEmail, $subject, $body, $headers)){
+                 echo "Your email has been sent";
+                }
+
+                else {
+                    echo "There was a problem. You mail was not sent.";
+                }
             }       
         }
     }  
