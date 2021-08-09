@@ -32,9 +32,6 @@ Feel free to fill the following form in and we'll get back to you ASAP!</p>
     //These must be at the top of your script, not inside a function
     use PHPMailer\PHPMailer\PHPMailer;
 
-    //Load Composer's autoloader
-    require 'vendor/autoload.php';
-
 // check if field filled
 if(filter_has_var(INPUT_GET, 'submit')){
     //variables
