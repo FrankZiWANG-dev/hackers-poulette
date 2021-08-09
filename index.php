@@ -67,29 +67,54 @@ if(filter_has_var(INPUT_GET, 'submit')){
         
             //validate
             if (filter_var(trim($email), FILTER_VALIDATE_EMAIL) == true){
-                $phpmailer = new PHPMailer(true);
+                $mailForHackers = new PHPMailer(true);
                 try {
-                    $phpmailer->isSMTP();
-                    $phpmailer->Host = 'smtp.mailtrap.io';
-                    $phpmailer->SMTPAuth = true;
-                    $phpmailer->Port = 2525;
-                    $phpmailer->Username = '3a523c273edefe';
-                    $phpmailer->Password = 'd6c06b4ce1aea8';
+                    $mailForHackers ->isSMTP();
+                    $mailForHackers ->Host = 'smtp.mailtrap.io';
+                    $mailForHackers ->SMTPAuth = true;
+                    $mailForHackers ->Port = 2525;
+                    $mailForHackers ->Username = '3a523c273edefe';
+                    $mailForHackers ->Password = 'd6c06b4ce1aea8';
                 
-                    $phpmailer->setFrom('info@hackers-poulette.com', 'Hackers-Poulette');
-                    $phpmailer->addAddress($email);
+                    $mailForHackers ->setFrom('info@hackers-poulette.com', 'Hackers-Poulette');
+                    $mailForHackers ->addAddress($email);
             
-                    $phpmailer->isHTML(true);
-                    $phpmailer->Subject = 'Message delivered to Hackers Poulette!';
-                    $phpmailer->Body    = '<h2> Thank you for getting in touch with Hackers Poulette! </h2>
+                    $mailForHackers ->isHTML(true);
+                    $mailForHackers ->Subject = 'Message from Client!';
+                    $mailForHackers ->Body    = '<h2> A client has reached out! </h2>
+                    <p>Here is their message:</p>
+                    <p>'.$message.'</p>';
+            
+                    $mailForHackers ->send();
+                    echo "Your message has been delivered!";
+                }
+                catch (Exception $e) {
+                        echo "Sorry! An error has occurred. ";
+                }
+
+                $mailForClient = new PHPMailer(true);
+                try {
+                    $mailForClient->isSMTP();
+                    $mailForClient->Host = 'smtp.mailtrap.io';
+                    $mailForClient->SMTPAuth = true;
+                    $mailForClient->Port = 2525;
+                    $mailForClient->Username = '3a523c273edefe';
+                    $mailForClient->Password = 'd6c06b4ce1aea8';
+                
+                    $mailForClient->setFrom('info@hackers-poulette.com', 'Hackers-Poulette');
+                    $mailForClientr->addAddress($email);
+            
+                    $mailForClient->isHTML(true);
+                    $mailForClient->Subject = 'Message delivered to Hackers Poulette!';
+                    $mailForClient->Body    = '<h2> Thank you for getting in touch with Hackers Poulette! </h2>
                     <p>You have reached us with the following message:</p>
                     <p>'.$message.'</p>
                     <p> We will get back to you ASAP!</p>
                     <p> Thank you for your patience! </p>
                     <p> Hackers Poulette </p>';
             
-                    $phpmailer->send();
-                    echo "Your message has been delivered!";
+                    $mailForClient->send();
+                    echo "A copy of your message has been sent to you by mail!";
                 }
                 catch (Exception $e) {
                         echo "Your message was not delivered. Try again!";
