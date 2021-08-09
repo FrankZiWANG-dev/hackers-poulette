@@ -28,6 +28,12 @@ Feel free to fill the following form in and we'll get back to you ASAP!</p>
 </div>
 
 <?php
+//Import PHPMailer classes into the global namespace
+    //These must be at the top of your script, not inside a function
+    use PHPMailer\PHPMailer\PHPMailer;
+
+    //Load Composer's autoloader
+    require 'vendor/autoload.php';
 
 // check if field filled
 if(filter_has_var(INPUT_GET, 'submit')){
@@ -37,6 +43,7 @@ if(filter_has_var(INPUT_GET, 'submit')){
     $email = $_GET["email"];
     $country = $_GET["country"];
     $message = $_GET["message"];
+    $subject = $_GET["subject"];
 
     $variables = array ($firstName, $lastName, $email, $country, $message);
     $error= "Please fill this field in.";
@@ -54,26 +61,41 @@ if(filter_has_var(INPUT_GET, 'submit')){
                     continue;
                 }
                 else{
-                    $variables[$x] = filter_input(INPUT_GET, $variables[$x], FILTER_SANITIZE_STRING);
+                    $variables[$x] = filter_var($variables[$x], FILTER_SANITIZE_STRING);
                 }
             }
+        
             //validate
-        if (filter_var(trim($email), FILTER_VALIDATE_EMAIL) == true){
-            $toEmail = "wang.frank.zi@gmail.com";
-            $subject = "Thanks for your message!";
-            $body = "<h2>Thank you for reaching out!</h2> <p> We'll get back to you ASAP! </p>";
-            $headers= "MIME-Version:1.0" ."\r\n";
-            $headers .= "Content-Type:text/html;charset=UTF-!"."\r\n";
-            $headers .= "From ".$firstName .$lastName ."<" .$email .">" ."\r\n";
+            if (filter_var(trim($email), FILTER_VALIDATE_EMAIL) == true){
 
-                if (mail($toEmail, $subject, $body, $headers)){
-                 echo "Your email has been sent";
-                }
+                  //Create an instance; passing `true` enables exceptions
+                $mail = new PHPMailer(true);
 
+                if ($mail->send()) {
+                    //Server settings
+                    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+                    $mail->isSMTP();                                            //Send using SMTP
+                    $mail->Host       = 'localhost';                     //Set the SMTP server to send through
+                    $mail->Port       = 25;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+                    //Recipients
+                    $mail->setFrom("wang.frank.zi@gmail.com");
+                    $mail->addAddress($mail);     //Add a recipient
+                    $mail->addReplyTo("wang.frank.zi@gmail.com");
+
+                    //Content
+                    $mail->isHTML(true);                                  //Set email format to HTML
+                    $mail->Subject = "Thank you for your message!";
+                    $mail->Body    = "<h2> Thank you for reaching out! </h2>\r\n <p>We'll get back to you ASAP</p>";
+                    $mail->AltBody = "Thanks for reaching out! We'll get back to you asap!";
+
+                    $mail->send();
+                    echo 'Message has been sent';
+                } 
                 else {
-                    echo "There was a problem. You mail was not sent.";
+                    echo "Message could not be sent.";
                 }
-            }       
+            }
         }
     }  
 }   
@@ -135,7 +157,7 @@ function invalidEmail(){
 
         <tr>
         <td> <label for="subject"> Subject: </label></td>
-        <td> <select>
+        <td> <select name = "subject">
             <option value="product"> Information about product </option>
             <option value="delivery"> Status of delivery </option>
             <option value="other" selected> Other </option>
