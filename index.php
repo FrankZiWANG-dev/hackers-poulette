@@ -28,9 +28,12 @@ Feel free to fill the following form in and we'll get back to you ASAP!</p>
 </div>
 
 <?php
-//Import PHPMailer classes into the global namespace
-    //These must be at the top of your script, not inside a function
-    use PHPMailer\PHPMailer\PHPMailer;
+//import phpmailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require "vendor/autoload.php";
 
 // check if field filled
 if(filter_has_var(INPUT_GET, 'submit')){
@@ -64,7 +67,33 @@ if(filter_has_var(INPUT_GET, 'submit')){
         
             //validate
             if (filter_var(trim($email), FILTER_VALIDATE_EMAIL) == true){
-                echo "e-mail is valid";
+                $phpmailer = new PHPMailer(true);
+                try {
+                    $phpmailer->isSMTP();
+                    $phpmailer->Host = 'smtp.mailtrap.io';
+                    $phpmailer->SMTPAuth = true;
+                    $phpmailer->Port = 2525;
+                    $phpmailer->Username = '3a523c273edefe';
+                    $phpmailer->Password = 'd6c06b4ce1aea8';
+                
+                    $phpmailer->setFrom('info@hackers-poulette.com', 'Hackers-Poulette');
+                    $phpmailer->addAddress($email);
+            
+                    $phpmailer->isHTML(true);
+                    $phpmailer->Subject = 'Message delivered to Hackers Poulette!';
+                    $phpmailer->Body    = '<h2> Thank you for getting in touch with Hackers Poulette! </h2>
+                    <p>You have reached us with the following message:</p>
+                    <p>'.$message.'</p>
+                    <p> We will get back to you ASAP!</p>
+                    <p> Thank you for your patience! </p>
+                    <p> Hackers Poulette </p>';
+            
+                    $phpmailer->send();
+                    echo "Your message has been delivered!";
+                }
+                catch (Exception $e) {
+                        echo "Your message was not delivered. Try again!";
+                }
             }
         }
     }  
